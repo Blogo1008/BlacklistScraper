@@ -1,0 +1,125 @@
+library(bitops)
+library(RCurl)
+library(XML)
+
+拍拍贷
+mat<-matrix(0,ncol=3,nrow=400)
+for (k in 1:20)
+{
+ht1="http://www.ppdai.com/blacklist/2014_m0_p"
+url=paste(ht1,k,sep="")
+site <- getURL(url,.encoding="UTF-8")
+paipaiInfo<-htmlParse(site)
+num<-getNodeSet(paipaiInfo,'//*/a[@target="_blank"]')
+number<-sapply(num, xmlAttrs)
+j=1;
+for (i in 1:length(number)){
+txt=unlist(number[i])
+txt=txt[1]
+txt=substring(txt,1,nchar(txt))
+txt=as.character(txt)
+if(grepl('/blacklist',txt))
+{txt=paste("http://www.ppdai.com",txt,sep="")
+site<-getURL(txt,.encoding="UTF-8")
+ziyeInfo<-htmlParse(site,asText=T,encoding="UTF-8")
+name<-getNodeSet(ziyeInfo,'//*/title')
+name<-sapply(name, xmlValue)
+phone<-getNodeSet(ziyeInfo,'//*/p')
+phone<-sapply(phone, xmlValue)
+phone<-phone[2]
+link<-getNodeSet(ziyeInfo,'//*/p/a')
+link<-sapply(link, xmlAttrs)
+link<-paste("http://www.ppdai.com",link,sep="")
+mat[(k-1)*20+j,1]=name
+mat[(k-1)*20+j,2]=phone
+mat[(k-1)*20+j,3]=link[1]
+j=j+1
+}
+}
+}
+write.csv(mat,"paipai.csv")
+
+###########################################################
+速可贷
+mat<-matrix(0,ncol=2,nrow=630)
+for (i in 1:30)
+{
+ht1="http://www.sukedai.com/black/index"
+ht2=".html"
+url=paste(ht1,i,ht2,sep="")
+site <- getURL(url,.encoding="gb2312")
+site=iconv(site ,"gb2312","UTF-8")
+paipaiInfo<-htmlParse(site,asText=T,encoding="UTF-8")
+num<-getNodeSet(paipaiInfo,'//*/a[@title=""]')
+number<-sapply(num, xmlValue)
+number<-number[7:length(number)]
+
+regexpr("身份证号",site)
+start=gregexpr("身份证号",site)
+start=unlist(start)
+idcard=substring(site, start+5, start+22)
+for (j in 1:length(number))
+{mat[(i-1)*20+j,1]=number[j]
+mat[(i-1)*20+j,2]=idcard[j]}
+}
+
+write(mat,"blacklist.txt")
+
+##################################################################
+贷联盟
+library(bitops)
+library(RCurl)
+library(XML)
+
+mat<-matrix(0,ncol=10,nrow=2600)
+for (i in 1:173)
+{
+ht1="http://www.dailianmeng.com/p2pblacklist/index.html?ajax=yw0&P2pBlacklist_page="
+url=paste(ht1,i,sep="")
+site <- getURL(url,.encoding="UTF-8")
+paipaiInfo<-htmlParse(site,asText=T,encoding="UTF-8")
+n1<-getNodeSet(paipaiInfo,'//*/tr/*[1]')
+n1<-sapply(n1, xmlValue)
+n1<-n1[-1]
+n2<-getNodeSet(paipaiInfo,'//*/tr/*[2]')
+n2<-sapply(n2, xmlValue)
+n2<-n2[-1]
+n3<-getNodeSet(paipaiInfo,'//*/tr/*[3]')
+n3<-sapply(n3, xmlValue)
+n3<-n3[-1]
+n4<-getNodeSet(paipaiInfo,'//*/tr/*[4]')
+n4<-sapply(n4, xmlValue)
+n4<-n4[-1]
+n5<-getNodeSet(paipaiInfo,'//*/tr/*[5]')
+n5<-sapply(n5, xmlValue)
+n5<-n5[-1]
+n6<-getNodeSet(paipaiInfo,'//*/tr/*[6]')
+n6<-sapply(n6, xmlValue)
+n6<-n6[-1]
+n7<-getNodeSet(paipaiInfo,'//*/tr/*[7]')
+n7<-sapply(n7, xmlValue)
+n7<-n7[-1]
+n8<-getNodeSet(paipaiInfo,'//*/tr/*[8]')
+n8<-sapply(n8, xmlValue)
+n8<-n8[-1]
+n9<-getNodeSet(paipaiInfo,'//*/tr/*[9]')
+n9<-sapply(n9, xmlValue)
+n9<-n9[-1]
+n10<-getNodeSet(paipaiInfo,'//*/tr/*[10]/a')
+n10<-sapply(n10, xmlAttrs)
+
+for (j in 1:length(n1))
+{mat[(i-1)*15+j,1]=n1[j]
+mat[(i-1)*15+j,2]=n2[j]
+mat[(i-1)*15+j,3]=n3[j]
+mat[(i-1)*15+j,4]=n4[j]
+mat[(i-1)*15+j,5]=n5[j]
+mat[(i-1)*15+j,6]=n6[j]
+mat[(i-1)*15+j,7]=n7[j]
+mat[(i-1)*15+j,8]=n8[j]
+mat[(i-1)*15+j,9]=n9[j]
+mat[(i-1)*15+j,10]=n10[2*j]
+}
+}
+
+write.csv(mat,"matrix3.csv")
